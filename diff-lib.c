@@ -512,7 +512,7 @@ static int diff_cache(struct rev_info *revs,
 	return unpack_trees(1, &t, &opts);
 }
 
-int run_diff_index(struct rev_info *revs, int cached)
+int run_diff_index(struct rev_info *revs, unsigned int option)
 {
 	struct object_array_entry *ent;
 
@@ -521,10 +521,10 @@ int run_diff_index(struct rev_info *revs, int cached)
 
 	trace_performance_enter();
 	ent = revs->pending.objects;
-	if (diff_cache(revs, &ent->item->oid, ent->name, cached))
+	if (diff_cache(revs, &ent->item->oid, ent->name, !!(option & DIFF_INDEX_CACHED)))
 		exit(128);
 
-	diff_set_mnemonic_prefix(&revs->diffopt, "c/", cached ? "i/" : "w/");
+	diff_set_mnemonic_prefix(&revs->diffopt, "c/", (option & DIFF_INDEX_CACHED) ? "i/" : "w/");
 	diffcore_fix_diff_index();
 	diffcore_std(&revs->diffopt);
 	diff_flush(&revs->diffopt);
